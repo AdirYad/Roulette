@@ -32,8 +32,6 @@
 }
 
 .countdown {
-  display: inline-block;
-  width: 150px;
   text-align: center;
   font-size: 28px;
   font-weight: 700;
