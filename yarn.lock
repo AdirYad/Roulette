@@ -5350,7 +5350,7 @@ inferno-vnode-flags@7.4.3:
   resolved "https://registry.yarnpkg.com/inferno-vnode-flags/-/inferno-vnode-flags-7.4.3.tgz#267879b18ea89579be40a2b8d9a2221c19126ab0"
   integrity sha512-NRaE5O64w2GZltBc2Eh0sof2BKOE19BxCj2xRdE6q9lHlQoirtPhMttYgWVBHDbXEy1BWesLla/IMj3MEca48g==
 
-inferno@7.4.3:
+inferno@^7.4.3:
   version "7.4.3"
   resolved "https://registry.yarnpkg.com/inferno/-/inferno-7.4.3.tgz#91f9f22227963f010ef2b6fa37e17f0c9897e2a6"
   integrity sha512-ZUk7dUKGQRlkU8ssGEHTuRmzJP0X0BYjn+xQg26uTUeFZZarjmQGXLtzJZvQY7r7uvzZjSDMvz0xwg/Ai+T8Rg==
@@ -6975,6 +6975,11 @@ mkdirp@0.5.1, mkdirp@0.5.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@
   integrity sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=
   dependencies:
     minimist "0.0.8"
+
+moment@^2.27.0:
+  version "2.27.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.27.0.tgz#8bff4e3e26a236220dfe3e36de756b6ebaa0105d"
+  integrity sha512-al0MUK7cpIcglMv3YF13qSgdAIqxHTO7brRtaz3DlSULbqfazqkc5kEjNrLDOM7fsjshoFIihnU8snrP7zUvhQ==
 
 move-concurrently@^1.0.1:
   version "1.0.1"

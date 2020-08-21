@@ -4,7 +4,8 @@
   "private": true,
   "dependencies": {
     "inferno": "^7.4.3",
-    "inferno-scripts": "7.0.4"
+    "inferno-scripts": "7.0.4",
+    "moment": "^2.27.0"
   },
   "scripts": {
     "start": "inferno-scripts start",

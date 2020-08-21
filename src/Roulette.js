@@ -3,35 +3,117 @@ import './assets/roulette_red.png';
 import './assets/roulette_blue.png';
 import './assets/roulette_gold.png';
 import './Roulette.css';
+import moment from 'moment';
+
+const socket = new WebSocket('wss://rustchance.com/feed');
+
+socket.onopen = () => {
+  socket.send(JSON.stringify({
+    'room': 'roulette',
+    'type': 'join',
+    'data': null
+  }))
+}
 
 class Roulette extends Component {
+  state = {
+    timer: {
+      seconds: null,
+      milliseconds: null,
+    },
+    isRolling: false,
+  };
+
+  componentDidMount() {
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+
+      if (data.type === 'list') {
+        const date = moment(data.data.current.timer);
+
+        this.setState(() => ({
+          timer: {
+            seconds: date.toDate().getSeconds(),
+            milliseconds: date.toDate().getMilliseconds() / 10,
+          },
+        }));
+
+        startTimer();
+      }
+
+      if (data.type === 'roll') {
+        this.setState(() => ({
+          isRolling: true,
+        }));
+      }
+    };
+
+    const startTimer = () => {
+      this.myInterval = setInterval(() => {
+        const timer = this.state.timer
+        const { seconds, milliseconds } = timer
+
+        if (! seconds && ! milliseconds) {
+          clearInterval(this.myInterval);
+          return;
+        }
+
+        if (seconds > 0) {
+          const newTimer = {
+            seconds: milliseconds === 0 ? seconds - 1 : seconds,
+            milliseconds: milliseconds === 0 ? 99 : milliseconds - 1,
+          }
+
+          setTimer(newTimer)
+        } else {
+          timer.milliseconds = timer.milliseconds - 1;
+
+          setTimer(timer);
+        }
+      }, 10);
+    }
+
+    const setTimer = ({ seconds, milliseconds }) => {
+      this.setState(() => ({
+        timer: {
+          seconds: seconds,
+          milliseconds: milliseconds,
+        },
+      }));
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.myInterval)
+  }
+
   render() {
+    const countdown = `${this.state.timer.seconds}.${this.state.timer.milliseconds}`;
+    const isRolling = this.state.isRolling;
+
+    const spinItems = [];
+
+    for (let i = 0; i < 3; i++) {
+      spinItems.push(<div className="spin red" />);
+      spinItems.push(<div className="spin blue" />);
+    }
+
     return (
       <div className="App">
         <div className="roulette">
-          <div className="roulette-roller">
+          <div className={ `roulette-roller ${isRolling || (this.state.timer.seconds === null || this.state.timer.milliseconds === null) ? ' hidden' : ''}` }>
             <div className="rolling">Rolling</div>
-            <div className="countdown">15</div>
+            <div className="countdown">{ countdown }</div>
           </div>
 
-          <div className="roulette-mask" />
+          <div className={ `roulette-mask ${isRolling ? ' hidden' : ''}` } />
 
-          <div className="roulette-indicator hidden" />
+          <div className={ `roulette-indicator ${! isRolling ? ' hidden' : ''}` } />
 
           <div className="roulette-spin-items">
-            <div className="spin red" />
-            <div className="spin blue" />
-            <div className="spin red" />
-            <div className="spin blue" />
-            <div className="spin red" />
-            <div className="spin blue" />
+            { spinItems }
             <div className="spin gold" />
-            <div className="spin red" />
-            <div className="spin blue" />
-            <div className="spin red" />
-            <div className="spin blue" />
-            <div className="spin red" />
-            <div className="spin blue" />
+            { spinItems }
           </div>
         </div>
       </div>
