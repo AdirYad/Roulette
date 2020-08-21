@@ -1,8 +1,8 @@
 import { version, Component } from 'inferno';
 import Logo from './logo';
-import './App.css';
+import './Roulette.css';
 
-class App extends Component {
+class Roulette extends Component {
   render() {
     return (
       <div className="App">
@@ -18,4 +18,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Roulette;

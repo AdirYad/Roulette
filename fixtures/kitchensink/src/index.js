@@ -6,6 +6,6 @@
  */
 
 import { render } from 'inferno';
-import App from './App';
+import App from './Roulette';
 
 render(<App />, document.getElementById('root'));
