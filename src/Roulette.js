@@ -22,30 +22,56 @@ class Roulette extends Component {
       milliseconds: null,
     },
     isRolling: false,
+    spinItems: [],
   };
 
   componentDidMount() {
+    for (let i = 0; i < 7; i++) {
+      this.state.spinItems.push(<div className="spin red" data-id={ i + 1 } />);
+
+      if (i === 3) {
+        this.state.spinItems.push(<div className="spin gold" data-id="0" />);
+      }
+
+      this.state.spinItems.push(<div className="spin blue" data-id={ 14 - 1 } />);
+    }
+
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data)
 
       if (data.type === 'list') {
         const date = moment(data.data.current.timer);
 
-        this.setState(() => ({
-          timer: {
-            seconds: date.toDate().getSeconds(),
-            milliseconds: date.toDate().getMilliseconds() / 10,
-          },
-        }));
+        const timer = {
+          seconds: date.toDate().getSeconds(),
+          milliseconds: date.toDate().getMilliseconds() / 10,
+        }
 
+        setTimer(timer)
         startTimer();
       }
 
       if (data.type === 'roll') {
+        const date = moment(data.data.newGame.timer);
+
+        const timer = {
+          seconds: date.toDate().getSeconds(),
+          milliseconds: date.toDate().getMilliseconds() / 10,
+        }
+
+        setTimer(timer)
+        startTimer();
+
         this.setState(() => ({
           isRolling: true,
         }));
+
+        rollRoulette()
       }
+    };
+
+    const rollRoulette = (color) => {
+      console.log(color)
     };
 
     const startTimer = () => {
@@ -90,13 +116,7 @@ class Roulette extends Component {
   render() {
     const countdown = `${this.state.timer.seconds}.${this.state.timer.milliseconds}`;
     const isRolling = this.state.isRolling;
-
-    const spinItems = [];
-
-    for (let i = 0; i < 3; i++) {
-      spinItems.push(<div className="spin red" />);
-      spinItems.push(<div className="spin blue" />);
-    }
+    const spinItems = this.state.spinItems;
 
     return (
       <div className="App">
@@ -111,8 +131,6 @@ class Roulette extends Component {
           <div className={ `roulette-indicator ${! isRolling ? ' hidden' : ''}` } />
 
           <div className="roulette-spin-items">
-            { spinItems }
-            <div className="spin gold" />
             { spinItems }
           </div>
         </div>
