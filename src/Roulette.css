@@ -74,15 +74,15 @@
 }
 
 .spin.red {
-  background-image: url('/assets/roulette_red.png');
+  background-image: url('./assets/roulette_red.png');
 }
 
 .spin.blue {
-  background-image: url('/assets/roulette_blue.png');
+  background-image: url('./assets/roulette_blue.png');
 }
 
 .spin.gold {
-  background-image: url('/assets/roulette_gold.png');
+  background-image: url('./assets/roulette_gold.png');
 }
 
 .hidden {

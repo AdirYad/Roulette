@@ -1,4 +1,7 @@
 import { Component } from 'inferno';
+import './assets/roulette_red.png';
+import './assets/roulette_blue.png';
+import './assets/roulette_gold.png';
 import './Roulette.css';
 
 class Roulette extends Component {
