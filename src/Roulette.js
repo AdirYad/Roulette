@@ -26,6 +26,8 @@ class Roulette extends Component {
   };
 
   componentDidMount() {
+    const rouletteSpinItems = document.querySelector('.roulette-spin-items');
+
     for (let i = 0; i < 7; i++) {
       this.state.spinItems.push(<div className="spin red" data-number={ i + 1 } />);
 
@@ -60,29 +62,41 @@ class Roulette extends Component {
         }
 
         setTimer(timer)
+        clearInterval(this.timerInterval);
         startTimer();
 
         this.setState(() => ({
           isRolling: true,
         }));
 
-        rollRoulette()
+        rollRoulette(data.data.number)
+
+        setTimeout(() => {
+          this.setState(() => ({
+            isRolling: false,
+          }));
+
+          rouletteSpinItems.style.transform = `translateX(0)`;
+        }, 8500)
       }
     };
 
-    const rollRoulette = (color) => {
-      console.log(color)
+    const rollRoulette = (number) => {
+      const spinItems = document.querySelectorAll(`[data-number="${number}"]`);
+      const spinItem = spinItems[spinItems.length - 2];
+
+      const offsetX = spinItem.getBoundingClientRect().x - document.documentElement.offsetWidth / 2;
+      const spinHeight = spinItem.offsetHeight;
+
+      const randOffset = Math.random() * (spinHeight - spinHeight / 6) + spinHeight / 6;
+
+      rouletteSpinItems.style.transform = `translateX(-${offsetX + randOffset}px)`
     };
 
     const startTimer = () => {
-      this.myInterval = setInterval(() => {
+      this.timerInterval = setInterval(() => {
         const timer = this.state.timer
         const { seconds, milliseconds } = timer
-
-        if (! seconds && ! milliseconds) {
-          clearInterval(this.myInterval);
-          return;
-        }
 
         if (seconds > 0) {
           const newTimer = {
@@ -95,6 +109,10 @@ class Roulette extends Component {
           timer.milliseconds = timer.milliseconds - 1;
 
           setTimer(timer);
+
+          if (timer.milliseconds === 0) {
+            clearInterval(this.timerInterval);
+          }
         }
       }, 10);
     }
