@@ -27,13 +27,13 @@ class Roulette extends Component {
 
   componentDidMount() {
     for (let i = 0; i < 7; i++) {
-      this.state.spinItems.push(<div className="spin red" data-id={ i + 1 } />);
+      this.state.spinItems.push(<div className="spin red" data-number={ i + 1 } />);
 
       if (i === 3) {
-        this.state.spinItems.push(<div className="spin gold" data-id="0" />);
+        this.state.spinItems.push(<div className="spin gold" data-number="0" />);
       }
 
-      this.state.spinItems.push(<div className="spin blue" data-id={ 14 - 1 } />);
+      this.state.spinItems.push(<div className="spin blue" data-number={ 14 - i } />);
     }
 
     socket.onmessage = (event) => {
@@ -114,24 +114,34 @@ class Roulette extends Component {
   }
 
   render() {
-    const countdown = `${this.state.timer.seconds}.${this.state.timer.milliseconds}`;
+    const timer = this.state.timer;
     const isRolling = this.state.isRolling;
     const spinItems = this.state.spinItems;
+
+    const countdown = `${timer.seconds}.${timer.milliseconds}`;
 
     return (
       <div className="App">
         <div className="roulette">
-          <div className={ `roulette-roller ${isRolling || (this.state.timer.seconds === null || this.state.timer.milliseconds === null) ? ' hidden' : ''}` }>
+          <div className={ `${isRolling || (timer.seconds === null || timer.milliseconds === null)
+              ? 'roulette-roller hidden'
+              : 'roulette-roller'}` }
+          >
             <div className="rolling">Rolling</div>
             <div className="countdown">{ countdown }</div>
           </div>
 
-          <div className={ `roulette-mask ${isRolling ? ' hidden' : ''}` } />
+          <div className={ `${! isRolling ? 'roulette-indicator hidden' : 'roulette-indicator'}` } />
 
-          <div className={ `roulette-indicator ${! isRolling ? ' hidden' : ''}` } />
-
-          <div className="roulette-spin-items">
-            { spinItems }
+          <div className="roulette-spin-container">
+            <div className={ isRolling ? 'roulette-spin-items' : 'roulette-spin-items spin-duration-0' }>
+              { spinItems }
+              { spinItems }
+              { spinItems }
+              { spinItems }
+              { spinItems }
+              { spinItems }
+            </div>
           </div>
         </div>
       </div>
