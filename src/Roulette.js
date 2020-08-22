@@ -22,41 +22,81 @@ class Roulette extends Component {
       milliseconds: null,
     },
     isRolling: false,
+    spinItems: [],
   };
 
   componentDidMount() {
+    const rouletteSpinItems = document.querySelector('.roulette-spin-items');
+
+    for (let i = 0; i < 7; i++) {
+      this.state.spinItems.push(<div className="spin red" data-number={ i + 1 } />);
+
+      if (i === 3) {
+        this.state.spinItems.push(<div className="spin gold" data-number="0" />);
+      }
+
+      this.state.spinItems.push(<div className="spin blue" data-number={ 14 - i } />);
+    }
+
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data)
 
       if (data.type === 'list') {
         const date = moment(data.data.current.timer);
 
-        this.setState(() => ({
-          timer: {
-            seconds: date.toDate().getSeconds(),
-            milliseconds: date.toDate().getMilliseconds() / 10,
-          },
-        }));
+        const timer = {
+          seconds: date.toDate().getSeconds(),
+          milliseconds: date.toDate().getMilliseconds() / 10,
+        }
 
+        setTimer(timer)
         startTimer();
       }
 
       if (data.type === 'roll') {
+        const date = moment(data.data.newGame.timer);
+
+        const timer = {
+          seconds: date.toDate().getSeconds(),
+          milliseconds: date.toDate().getMilliseconds() / 10,
+        }
+
+        setTimer(timer)
+        clearInterval(this.timerInterval);
+        startTimer();
+
         this.setState(() => ({
           isRolling: true,
         }));
+
+        rollRoulette(data.data.number)
+
+        setTimeout(() => {
+          this.setState(() => ({
+            isRolling: false,
+          }));
+
+          rouletteSpinItems.style.transform = `translateX(0)`;
+        }, 8500)
       }
     };
 
+    const rollRoulette = (number) => {
+      const spinItems = document.querySelectorAll(`[data-number="${number}"]`);
+      const spinItem = spinItems[spinItems.length - 2];
+
+      const offsetX = spinItem.getBoundingClientRect().x - document.documentElement.offsetWidth / 2;
+      const spinHeight = spinItem.offsetHeight;
+
+      const randOffset = Math.random() * (spinHeight - spinHeight / 6) + spinHeight / 6;
+
+      rouletteSpinItems.style.transform = `translateX(-${offsetX + randOffset}px)`
+    };
+
     const startTimer = () => {
-      this.myInterval = setInterval(() => {
+      this.timerInterval = setInterval(() => {
         const timer = this.state.timer
         const { seconds, milliseconds } = timer
-
-        if (! seconds && ! milliseconds) {
-          clearInterval(this.myInterval);
-          return;
-        }
 
         if (seconds > 0) {
           const newTimer = {
@@ -69,6 +109,10 @@ class Roulette extends Component {
           timer.milliseconds = timer.milliseconds - 1;
 
           setTimer(timer);
+
+          if (timer.milliseconds === 0) {
+            clearInterval(this.timerInterval);
+          }
         }
       }, 10);
     }
@@ -88,32 +132,34 @@ class Roulette extends Component {
   }
 
   render() {
-    const countdown = `${this.state.timer.seconds}.${this.state.timer.milliseconds}`;
+    const timer = this.state.timer;
     const isRolling = this.state.isRolling;
+    const spinItems = this.state.spinItems;
 
-    const spinItems = [];
-
-    for (let i = 0; i < 3; i++) {
-      spinItems.push(<div className="spin red" />);
-      spinItems.push(<div className="spin blue" />);
-    }
+    const countdown = `${timer.seconds}.${timer.milliseconds}`;
 
     return (
       <div className="App">
         <div className="roulette">
-          <div className={ `roulette-roller ${isRolling || (this.state.timer.seconds === null || this.state.timer.milliseconds === null) ? ' hidden' : ''}` }>
+          <div className={ `${isRolling || (timer.seconds === null || timer.milliseconds === null)
+              ? 'roulette-roller hidden'
+              : 'roulette-roller'}` }
+          >
             <div className="rolling">Rolling</div>
             <div className="countdown">{ countdown }</div>
           </div>
 
-          <div className={ `roulette-mask ${isRolling ? ' hidden' : ''}` } />
+          <div className={ `${! isRolling ? 'roulette-indicator hidden' : 'roulette-indicator'}` } />
 
-          <div className={ `roulette-indicator ${! isRolling ? ' hidden' : ''}` } />
-
-          <div className="roulette-spin-items">
-            { spinItems }
-            <div className="spin gold" />
-            { spinItems }
+          <div className="roulette-spin-container">
+            <div className={ isRolling ? 'roulette-spin-items' : 'roulette-spin-items spin-duration-0' }>
+              { spinItems }
+              { spinItems }
+              { spinItems }
+              { spinItems }
+              { spinItems }
+              { spinItems }
+            </div>
           </div>
         </div>
       </div>
